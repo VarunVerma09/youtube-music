@@ -15,17 +15,17 @@ export class MessageHandler {
   }
 
   register(socket: Socket): void {
-    socket.on("join_room", (data) => this.handleJoinRoom(socket, data));
-    socket.on("leave_room", (data) => this.handleLeaveRoom(socket, data));
-    socket.on("play", (data) => this.handlePlay(socket, data));
-    socket.on("pause", (data) => this.handlePause(socket, data));
-    socket.on("seek", (data) => this.handleSeek(socket, data));
-    socket.on("change_video", (data) => this.handleChangeVideo(socket, data));
-    socket.on("assign_role", (data) => this.handleAssignRole(socket, data));
-    socket.on("remove_participant", (data) => this.handleRemoveParticipant(socket, data));
-    socket.on("transfer_host", (data) => this.handleTransferHost(socket, data));
-    socket.on("chat_message", (data) => this.handleChatMessage(socket, data));
-    socket.on("request_sync", (data) => this.handleRequestSync(socket, data));
+    socket.on("join_room", (data: unknown) => this.handleJoinRoom(socket, data as { roomId: string; username: string }));
+    socket.on("leave_room", (data: unknown) => this.handleLeaveRoom(socket, data as { roomId: string }));
+    socket.on("play", (data: unknown) => this.handlePlay(socket, data as { roomId: string; currentTime: number }));
+    socket.on("pause", (data: unknown) => this.handlePause(socket, data as { roomId: string; currentTime: number }));
+    socket.on("seek", (data: unknown) => this.handleSeek(socket, data as { roomId: string; time: number }));
+    socket.on("change_video", (data: unknown) => this.handleChangeVideo(socket, data as { roomId: string; videoId: string }));
+    socket.on("assign_role", (data: unknown) => this.handleAssignRole(socket, data as { roomId: string; userId: string; role: string }));
+    socket.on("remove_participant", (data: unknown) => this.handleRemoveParticipant(socket, data as { roomId: string; userId: string }));
+    socket.on("transfer_host", (data: unknown) => this.handleTransferHost(socket, data as { roomId: string; userId: string }));
+    socket.on("chat_message", (data: unknown) => this.handleChatMessage(socket, data as { roomId: string; message: string }));
+    socket.on("request_sync", (data: unknown) => this.handleRequestSync(socket, data as { roomId: string }));
     socket.on("disconnect", () => this.handleDisconnect(socket));
   }
 

@@ -73,29 +73,21 @@ Copy `client/.env.example` to `client/.env` if you need to change the server URL
 
 ## Deployment (Render — recommended)
 
-Render supports WebSocket servers natively.
+Render supports WebSocket servers natively. Deploy as **two separate services**.
 
-### Backend
+### Backend (Web Service)
 
-1. Create a new **Web Service** on [Render](https://render.com) pointing to the `server` folder
-2. Build command: `npm install && npm run build`
-3. Start command: `npm start`
-4. Add environment variable: `CLIENT_URL=https://your-frontend.onrender.com`
+- Root directory: `server`
+- Build command: `npm install && npm run build`
+- Start command: `npm start`
+- Environment variable: `CLIENT_URL=https://your-frontend.onrender.com`
 
-### Frontend
+### Frontend (Static Site)
 
-1. Create a new **Static Site** on Render pointing to the `client` folder
-2. Build command: `npm install && npm run build`
-3. Publish directory: `dist`
-4. Add environment variable: `VITE_SERVER_URL=https://your-backend.onrender.com`
-
-### Environment Variables
-
-| Variable | Where | Description |
-|---|---|---|
-| `PORT` | Server | Port to listen on (default: 3001) |
-| `CLIENT_URL` | Server | Frontend origin for CORS |
-| `VITE_SERVER_URL` | Client | Backend WebSocket/API URL |
+- Root directory: `client`
+- Build command: `npm install && npm run build`
+- Publish directory: `dist`
+- Environment variable: `VITE_SERVER_URL=https://your-backend.onrender.com`
 
 ## WebSocket Events
 

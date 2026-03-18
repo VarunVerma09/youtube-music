@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import cors from "cors";
@@ -25,15 +25,15 @@ app.use(express.json());
 const roomManager = new RoomManager();
 const messageHandler = new MessageHandler(io, roomManager);
 
-app.get("/health", (_req, res) => {
+app.get("/health", (_req: Request, res: Response) => {
   res.json({ status: "ok" });
 });
 
-app.get("/room/:roomId/exists", (req, res) => {
+app.get("/room/:roomId/exists", (req: Request, res: Response) => {
   res.json({ exists: roomManager.roomExists(req.params.roomId) });
 });
 
-io.on("connection", (socket) => {
+io.on("connection", (socket: import("socket.io").Socket) => {
   messageHandler.register(socket);
 });
 
