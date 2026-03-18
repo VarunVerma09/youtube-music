@@ -38,6 +38,7 @@ export function YoutubePlayer({ videoId, playerRef, isSyncing, onPlayerReady, on
           iv_load_policy: 3,
           fs: 0,
           autoplay: 0,
+          origin: window.location.origin,
         },
         events: {
           onReady: () => {
