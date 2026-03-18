@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { socket } from "../socket";
 import type { SessionInfo, Participant, VideoState, ChatMessage, Role } from "../types";
-import { YoutubePlayer } from "../components/YoutubePlayer";
+import { YoutubePlayer, playerReadyRef } from "../components/YoutubePlayer";
 import { ParticipantList } from "../components/ParticipantList";
 import { Chat } from "../components/Chat";
 import { VideoControls } from "../components/VideoControls";
@@ -33,13 +33,17 @@ export function WatchRoom({ session, onLeave }: Props) {
   }, []);
 
   const syncPlayer = useCallback((state: VideoState) => {
-    if (!playerRef.current) return;
+    if (!playerRef.current || !playerReadyRef.current) return;
     isSyncing.current = true;
-    playerRef.current.seekTo(state.currentTime, true);
-    if (state.playState === "playing") {
-      playerRef.current.playVideo();
-    } else {
-      playerRef.current.pauseVideo();
+    try {
+      playerRef.current.seekTo(state.currentTime, true);
+      if (state.playState === "playing") {
+        playerRef.current.playVideo();
+      } else {
+        playerRef.current.pauseVideo();
+      }
+    } catch (e) {
+      console.warn("syncPlayer error:", e);
     }
     setTimeout(() => { isSyncing.current = false; }, 800);
   }, []);
@@ -95,25 +99,34 @@ export function WatchRoom({ session, onLeave }: Props) {
     });
 
     socket.on("play", (data: { currentTime: number }) => {
-      isSyncing.current = true;
-      playerRef.current?.seekTo(data.currentTime, true);
-      playerRef.current?.playVideo();
       setVideoState((v) => ({ ...v, playState: "playing", currentTime: data.currentTime }));
+      if (!playerRef.current || !playerReadyRef.current) return;
+      isSyncing.current = true;
+      try {
+        playerRef.current.seekTo(data.currentTime, true);
+        playerRef.current.playVideo();
+      } catch (e) { console.warn("play error:", e); }
       setTimeout(() => { isSyncing.current = false; }, 800);
     });
 
     socket.on("pause", (data: { currentTime: number }) => {
-      isSyncing.current = true;
-      playerRef.current?.pauseVideo();
-      playerRef.current?.seekTo(data.currentTime, true);
       setVideoState((v) => ({ ...v, playState: "paused", currentTime: data.currentTime }));
+      if (!playerRef.current || !playerReadyRef.current) return;
+      isSyncing.current = true;
+      try {
+        playerRef.current.pauseVideo();
+        playerRef.current.seekTo(data.currentTime, true);
+      } catch (e) { console.warn("pause error:", e); }
       setTimeout(() => { isSyncing.current = false; }, 800);
     });
 
     socket.on("seek", (data: { time: number }) => {
-      isSyncing.current = true;
-      playerRef.current?.seekTo(data.time, true);
       setVideoState((v) => ({ ...v, currentTime: data.time }));
+      if (!playerRef.current || !playerReadyRef.current) return;
+      isSyncing.current = true;
+      try {
+        playerRef.current.seekTo(data.time, true);
+      } catch (e) { console.warn("seek error:", e); }
       setTimeout(() => { isSyncing.current = false; }, 800);
     });
 
