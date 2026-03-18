@@ -12,7 +12,7 @@ const httpServer = createServer(app);
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:4173",
-  "https://youtube-music-17.onrender.com/",
+  "https://youtube-music-18.onrender.com",
 ];
 
 // ✅ Socket.io setup
