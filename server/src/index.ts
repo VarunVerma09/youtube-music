@@ -8,23 +8,36 @@ import { MessageHandler } from "./MessageHandler";
 const app = express();
 const httpServer = createServer(app);
 
-const allowedOrigins = process.env.CLIENT_URL
-  ? [process.env.CLIENT_URL]
-  : ["http://localhost:5173", "http://localhost:4173"];
+// ✅ Allowed origins
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:4173",
+  "https://privateroom.vercel.app",
+];
 
+// ✅ Socket.io setup
 const io = new Server(httpServer, {
   cors: {
     origin: allowedOrigins,
     methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 
-app.use(cors({ origin: allowedOrigins }));
+// ✅ Express CORS
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 
 const roomManager = new RoomManager();
 const messageHandler = new MessageHandler(io, roomManager);
 
+// ✅ Routes
 app.get("/health", (_req: Request, res: Response) => {
   res.json({ status: "ok" });
 });
@@ -33,11 +46,14 @@ app.get("/room/:roomId/exists", (req: Request, res: Response) => {
   res.json({ exists: roomManager.roomExists(req.params.roomId) });
 });
 
-io.on("connection", (socket: import("socket.io").Socket) => {
+// ✅ Socket connection
+io.on("connection", (socket) => {
+  console.log("User connected:", socket.id);
   messageHandler.register(socket);
 });
 
 const PORT = process.env.PORT || 3001;
+
 httpServer.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
